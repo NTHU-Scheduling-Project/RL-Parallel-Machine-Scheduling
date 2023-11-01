@@ -1,0 +1,9 @@
+instance: la16
+
+train:
+  episodes: 500
+val:
+  frequency: 50
+
+
+skip_ratio: 0.02
