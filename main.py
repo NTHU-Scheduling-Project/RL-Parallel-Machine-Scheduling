@@ -20,7 +20,7 @@ if __name__ == '__main__':
     jt_tmp = pd.read_excel("data/PMSP_dataset.xlsx",sheet_name="Job Type",index_col =[0])
 
     N_J = pt_tmp.shape[0] # number of jobs
-    N_M = 4 # number of machines
+    N_M = 8 # number of machines
 
     processing_time = [list(map(int, pt_tmp.iloc[i])) for i in range(N_J)]
     job_family = [list(map(int,jt_tmp.iloc[i])) for i in range(N_J)]

@@ -1,7 +1,7 @@
 instance: la16
 
 train:
-  episodes: 500
+  episodes: 200
 val:
   frequency: 50
 

@@ -96,12 +96,12 @@ class DQN:
             return
         
         transitions = self.replay_buffer.sample(self.batch_size)
-        states = torch.Tensor(np.array([t.state for t in transitions]))
-        actions = torch.LongTensor([t.action for t in transitions])
-        rewards = torch.Tensor([t.reward for t in transitions])
-        next_states = torch.Tensor(np.array([t.next_state for t in transitions]))
-        are_final_steps = torch.Tensor([t.is_final_step for t in transitions])
-        legal_actions_mask = torch.Tensor(np.array([t.legal_actions_mask for t in transitions]))
+        states = torch.Tensor(np.array([t.state for t in transitions])).to(self.device)
+        actions = torch.LongTensor([t.action for t in transitions]).to(self.device)
+        rewards = torch.Tensor([t.reward for t in transitions]).to(self.device)
+        next_states = torch.Tensor(np.array([t.next_state for t in transitions])).to(self.device)
+        are_final_steps = torch.Tensor([t.is_final_step for t in transitions]).to(self.device)
+        legal_actions_mask = torch.Tensor(np.array([t.legal_actions_mask for t in transitions])).to(self.device)
 
         q_values = self.q_network(states)
         target_q_values = self.target_q_network(next_states).detach()
@@ -114,7 +114,7 @@ class DQN:
         
         target = (rewards + (1 - are_final_steps) * self.gamma * max_next_q)
         action_indices = torch.stack([
-            torch.arange(q_values.shape[0], dtype=torch.long), actions], dim=0)
+            torch.arange(q_values.shape[0], dtype=torch.long).to(self.device), actions], dim=0)
         
         predictions = q_values[list(action_indices)]
 

@@ -31,17 +31,18 @@ class Runner:
         shortest_makespan = np.inf
         for i in range(1, self.run_config["train"]["episodes"] + 1):
             phase = "train"
-            obs = self.env.reset()
-            state = torch.tensor(obs, dtype=torch.float32, device=self.device).unsqueeze(0)
+            state = self.env.reset()
+            #state = torch.tensor(obs, dtype=torch.float32, device=self.device).unsqueeze(0)
             legal_actions = np.arange(self.N_F * self.N_F)
             R = 0  # return (sum of rewards)
             t = 0  # time step
             while True:
-                action = agent.select_action(state, legal_actions)
+                action = agent.select_action(torch.tensor(state, dtype=torch.float32, device=self.device).unsqueeze(0), legal_actions)
                 obs, reward, done, legal_actions, info = self.env.step(action)
-                next_state = torch.tensor(obs, dtype=torch.float32, device=self.device).unsqueeze(0)
+                #next_state = torch.tensor(obs, dtype=torch.float32, device=self.device).unsqueeze(0)
+                next_state = obs
                 R += reward
-                agent.add_transition(state.squeeze(0).numpy(), action, reward, next_state.squeeze(0).numpy(), done, legal_actions)
+                agent.add_transition(state, action, reward, next_state, done, legal_actions)
                 state = next_state
                 agent.learn()
 
@@ -82,16 +83,17 @@ class Runner:
         #with agent.eval_mode():
         pbar = tqdm(range((start_i - 1) * n_episodes + 1, start_i * n_episodes + 1))
         for i in pbar:
-            obs = self.env.reset()
-            state = torch.tensor(obs, dtype=torch.float32, device=self.device).unsqueeze(0)
+            state = self.env.reset()
+            #state = torch.tensor(obs, dtype=torch.float32, device=self.device).unsqueeze(0)
             count += 1
             legal_actions = np.arange(self.N_F * self.N_F)
             R = 0  # return (sum of rewards)
             t = 0  # time step
             while True:
-                action = agent.select_action(state, legal_actions, "val")
+                action = agent.select_action(torch.tensor(state, dtype=torch.float32, device=self.device).unsqueeze(0), legal_actions, "val")
                 obs, reward, done, legal_actions, info = self.env.step(action)
-                next_state = torch.tensor(obs, dtype=torch.float32, device=self.device).unsqueeze(0)
+                #next_state = torch.tensor(obs, dtype=torch.float32, device=self.device).unsqueeze(0)
+                next_state = obs
                 #print(legal_actions)
                 R += reward
                 state = next_state

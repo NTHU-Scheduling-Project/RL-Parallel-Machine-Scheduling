@@ -1,0 +1,10 @@
+gym
+torch
+numpy
+black
+PyYAML
+matplotlib
+tensorboardX
+tensorboard
+tqdm
+filelock
