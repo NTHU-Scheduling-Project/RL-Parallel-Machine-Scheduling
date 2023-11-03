@@ -97,13 +97,18 @@ class PMSPEnv(gym.Env):
         self.utilization_state = np.zeros((self.N_F, 3))
         self.action_history_state = np.zeros((self.N_F, 2))
         #self.other_history_state = np.zeros(3)
+        family_setup_time_argsort = np.argsort(self.family_setup_time)
 
         # 一開始每台機器隨機分配 job family 並 setup
         for i in range(self.N_M):
-            family = random.randint(1, self.N_F)
+            '''family = random.randint(1, self.N_F)
             self.machine_finishing_time[i] = self.family_setup_time[family - 1]
             self.machine_setup_status[i] = (family - 1)
-            self.setup_record_per_machine[i].append((0, self.machine_finishing_time[i], family - 1))
+            self.setup_record_per_machine[i].append((0, self.machine_finishing_time[i], family - 1))'''
+            family = family_setup_time_argsort[i % self.N_F]
+            self.machine_finishing_time[i] = self.family_setup_time[family]
+            self.machine_setup_status[i] = family
+            self.setup_record_per_machine[i].append((0, self.machine_finishing_time[i], family))
 
         obs = self.get_observations(self.in_progress_job_state, self.setup_time_state, self.utilization_state, self.action_history_state)
         return obs
