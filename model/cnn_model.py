@@ -10,12 +10,12 @@ class Net(nn.Module):
         self.conv1 = nn.Sequential(nn.Conv2d(1, 16, (1, 1), stride=(1, 1), padding=(0, 0)), nn.ReLU(), nn.BatchNorm2d(16))
         self.conv2 = nn.Sequential(nn.Conv2d(16, 32, (1, 2), stride=(1, 1), padding=(0, 0)), nn.ReLU(), nn.BatchNorm2d(32))
         self.conv3 = nn.Sequential(nn.Conv2d(32, 64, (1, 3), stride=(1, 1), padding=(0, 0)), nn.ReLU(), nn.BatchNorm2d(64))
-        # output: 4*10*64 for N_J = 20, N_F = 4
-        # output: 8*14*64 for N_J = 40, N_F = 8
+        # output: 4*13*64 for N_J = 20, N_F = 4
+        
 
         if not dueling:
             self.value = nn.Sequential(
-                nn.Linear(8*14*64, 256),
+                nn.Linear(4*13*64, 256),
                 nn.ReLU(),
                 nn.Linear(256, 128),
                 nn.ReLU(),
@@ -25,7 +25,7 @@ class Net(nn.Module):
             )
         else:
             self.value = nn.Sequential(
-                nn.Linear(8*14*64, 256),
+                nn.Linear(4*13*64, 256),
                 nn.ReLU(),
                 nn.Linear(256, 128),
                 nn.ReLU(),
@@ -34,7 +34,7 @@ class Net(nn.Module):
                 nn.Linear(64, 1),
             )
             self.advantage = nn.Sequential(
-                nn.Linear(8*14*64, 256),
+                nn.Linear(4*13*64, 256),
                 nn.ReLU(),
                 nn.Linear(256, 128),
                 nn.ReLU(),

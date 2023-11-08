@@ -82,7 +82,8 @@ class DQN:
         self.epsilon_threshold = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * math.exp(-1. * self.step_counter / self.epsilon_decay_duration)
         self.step_counter += 1
 
-        if sample < self.epsilon_threshold and flag != "val":        
+        #if sample < self.epsilon_threshold and flag != "val":
+        if sample < self.epsilon_threshold or flag != "val":        
             action = np.random.choice(legal_actions)
         else:
             q_values = self.q_network(state).detach()[0]

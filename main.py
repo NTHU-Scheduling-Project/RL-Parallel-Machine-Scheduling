@@ -16,25 +16,31 @@ if __name__ == '__main__':
 
     run_config = global_util.load_yaml("data/run_config.yml")
     # read input file
-    pt_tmp = pd.read_excel("data/PMSP_dataset.xlsx",sheet_name="Processing Time",index_col =[0])
-    jt_tmp = pd.read_excel("data/PMSP_dataset.xlsx",sheet_name="Job Type",index_col =[0])
+    #pt_tmp = pd.read_excel("data/PMSP_dataset.xlsx",sheet_name="Processing Time",index_col =[0])
+    #jt_tmp = pd.read_excel("data/PMSP_dataset.xlsx",sheet_name="Job Type",index_col =[0])
 
-    N_J = pt_tmp.shape[0] # number of jobs
-    N_M = 8 # number of machines
+    training_data = pd.read_excel("data/training_dataset.xlsx", sheet_name = "processing_time", index_col = [0, 1])
+    training_data = np.array(training_data).reshape(65, 20, 3)
+    
+    validation_data = []
+    for i in range(1, 17):
+        pt_tmp = pd.read_excel(f"data/validation/dataset_{i}.xlsx",sheet_name="Processing Time",index_col =[0])
+        jt_tmp = pd.read_excel(f"data/validation/dataset_{i}.xlsx",sheet_name="Job Type",index_col =[0])
+        validation_data.append([np.array(pt_tmp), np.array(jt_tmp).astype(int)])
 
-    processing_time = [list(map(int, pt_tmp.iloc[i])) for i in range(N_J)]
-    job_family = [list(map(int,jt_tmp.iloc[i])) for i in range(N_J)]
-    processing_time = np.array(processing_time)
-    job_family = np.array(job_family)
-    remaining_processing_time = np.zeros(N_J)
+    job_family, processing_time = np.split(training_data, [2], axis=2)
+    job_family = job_family.astype(int)
+    processing_time = processing_time.astype(int)
 
-    N_F = np.max(job_family[:, 0])
+    N_J = training_data.shape[1] # number of jobs per instance
+    N_M = 4 # number of machines
+    N_F = int(np.max(training_data[:, :, 0]))
 
     env = PMSPEnv(args, N_J, N_M, N_F, processing_time, job_family)
 
     agent = DQN(n_actions = (N_F * N_F))
 
-    runner = Runner(args, run_config, env, N_F)
+    runner = Runner(args, run_config, env, N_F, training_data, validation_data)
     if args.test:
         runner.validate(agent, start_i=1, phase="test")
     else:

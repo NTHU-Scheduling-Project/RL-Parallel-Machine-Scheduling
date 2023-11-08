@@ -19,10 +19,8 @@ class PMSPEnv(gym.Env):
         self.N_F = family_size
         self.T = int(np.mean(processing_time[:, 0]) / 2)
         self.H_p = int(np.max(processing_time[:, 0]) / self.T)
-        self.processing_time = processing_time
-        self.job_family = job_family
         # state dependent
-        self.remaining_processing_time = None
+        '''self.remaining_processing_time = None
         self.family_setup_time = np.zeros(self.N_F)
         for i in range(self.job_family.shape[0]):
             self.family_setup_time[self.job_family[i, 0] - 1] = self.job_family[i, 1]
@@ -44,9 +42,24 @@ class PMSPEnv(gym.Env):
         #self.other_history_state = np.zeros(3)
         self.makespan = None
         self.step_count = None
-        self.reset()
+        self.reset()'''
 
-    def init_data(self, **kwargs):
+    def init_data(self, processing_time, job_family):
+        self.processing_time = processing_time
+        self.job_family = job_family
+        # state dependent
+        self.family_setup_time = np.zeros(self.N_F)
+        for i in range(self.job_family.shape[0]):
+            self.family_setup_time[self.job_family[i, 0] - 1] = self.job_family[i, 1]
+
+        self.setup_time = np.zeros((self.N_F, self.N_F))
+        for i in range(self.N_F):
+            for j in range(self.N_F):
+                if i == j:
+                    self.setup_time[i, j] = 0
+                else:
+                    self.setup_time[i, j] = self.family_setup_time[i]
+
         self.makespan = 0
         self.step_count = 0
         self.last_utilization = 0
@@ -77,8 +90,8 @@ class PMSPEnv(gym.Env):
         self.feasible_actions = np.zeros((self.N_F, self.N_F))
         
 
-    def reset(self, **kwargs):
-        self.init_data(**kwargs)
+    def reset(self, processing_time, job_family):
+        self.init_data(processing_time, job_family)
         self.in_progress_job_state = np.zeros((self.N_F, self.H_p))
         self.setup_time_state = copy.deepcopy(self.setup_time)
         self.setup_time_max = np.max(self.setup_time_state)
@@ -225,6 +238,7 @@ class PMSPEnv(gym.Env):
                 legal_actions.append(i)
 
         self.step_count += 1
+        #print(self.waiting_job_per_family)
         #obs = None
         return obs, reward, done, legal_actions, {}
 
