@@ -70,6 +70,7 @@ class Runner:
                 if makespan < shortest_makespan:
                     shortest_makespan = makespan
                     agent.save(os.path.join(self.model_dir, "best"))
+                    self.env.draw_gantt(0)
                 #agent.save(os.path.join(self.model_dir, "epi_{}".format(i)))
 
     def validate(self, agent, start_i=1, phase="val"):
@@ -90,7 +91,7 @@ class Runner:
             R = 0  # return (sum of rewards)
             t = 0  # time step
             while True:
-                action = agent.select_action(torch.tensor(state, dtype=torch.float32, device=self.device).unsqueeze(0), legal_actions, "val")
+                action = agent.select_action(torch.tensor(state, dtype=torch.float32, device=self.device).unsqueeze(0), legal_actions, phase)
                 obs, reward, done, legal_actions, info = self.env.step(action)
                 #next_state = torch.tensor(obs, dtype=torch.float32, device=self.device).unsqueeze(0)
                 next_state = obs

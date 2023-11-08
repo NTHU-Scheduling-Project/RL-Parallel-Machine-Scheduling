@@ -27,13 +27,13 @@ class DQN:
     def __init__(
         self,
         n_actions,
-        replay_buffer_capacity: int = 10000,
+        replay_buffer_capacity: int = 100000,
         batch_size: int = 128,
-        learning_rate: float = 0.001,
+        learning_rate: float = 0.0001,
         tau: float = 0.005,
         gamma: float = 0.99,
         epsilon_start: float = 1.0,
-        epsilon_end: float = 0.05,
+        epsilon_end: float = 0.1,
         epsilon_decay_duration: int = 1000
     ):
         self.n_actions = n_actions
@@ -82,7 +82,7 @@ class DQN:
         self.epsilon_threshold = self.epsilon_end + (self.epsilon_start - self.epsilon_end) * math.exp(-1. * self.step_counter / self.epsilon_decay_duration)
         self.step_counter += 1
 
-        if sample < self.epsilon_threshold and flag != "val":        
+        if sample < self.epsilon_threshold and flag != "test":        
             action = np.random.choice(legal_actions)
         else:
             q_values = self.q_network(state).detach()[0]
