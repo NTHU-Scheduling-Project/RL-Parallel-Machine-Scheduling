@@ -46,18 +46,6 @@ class PMSPEnv(gym.Env):
         self.step_count = None
         self.reset()
 
-        '''legal_actions = np.ones(self.N_F * self.N_F)
-        total_reward = 0
-        while True:
-            obs, reward, done, legal_actions, info = self.step(np.random.choice(legal_actions))
-            #print(legal_actions)
-            total_reward += reward
-            if done:
-                #print(obs.shape)
-                break
-        print(total_reward)'''
-        #self.draw_gantt("20*4")
-
     def init_data(self, **kwargs):
         self.makespan = 0
         self.step_count = 0
@@ -99,7 +87,7 @@ class PMSPEnv(gym.Env):
         #self.other_history_state = np.zeros(3)
         family_setup_time_argsort = np.argsort(self.family_setup_time)
 
-        # 一開始每台機器隨機分配 job family 並 setup
+        # 一開始每台機器依據 setup time 由小到大分配 job family 並 setup
         for i in range(self.N_M):
             '''family = random.randint(1, self.N_F)
             self.machine_finishing_time[i] = self.family_setup_time[family - 1]
@@ -199,7 +187,6 @@ class PMSPEnv(gym.Env):
                 else:
                     self.setup_time_state[f, g] = self.setup_time_max
         
-
         # utilization state
         accumulated_processing_time = self.processing_time[:, 0] - self.remaining_processing_time
         accumulated_processing_time_per_family = np.zeros(self.N_F)
@@ -231,12 +218,6 @@ class PMSPEnv(gym.Env):
             reward = utilization - self.last_utilization
             self.last_utilization = utilization
 
-        #self.makespan = np.max(self.machine_finishing_time)
-        #utilization = np.sum(accumulated_processing_time) / (self.N_M * self.makespan)
-        #reward = utilization - self.last_utilization
-        #self.last_utilization = utilization
-        #print(self.waiting_job_per_family)
-        #done = True if np.max(self.waiting_job_per_family) == 0 else False
         self.feasible_actions = self.feasible_actions.flatten()
         legal_actions = []
         for i in range(self.N_F * self.N_F):
