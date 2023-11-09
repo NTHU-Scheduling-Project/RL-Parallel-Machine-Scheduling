@@ -10,6 +10,7 @@ import plotly.figure_factory as ff
 import plotly.express as px
 from plotly.offline import plot
 from gym.core import ActType, ObsType
+from sklearn.preprocessing import MinMaxScaler
 
 class PMSPEnv(gym.Env):
     def __init__(self, args, job_size, machine_size, family_size, processing_time, job_family):
@@ -244,7 +245,9 @@ class PMSPEnv(gym.Env):
 
 
     def get_observations(self, in_progress_job_state, setup_time_state, utilization_state, action_history_state):
-        return np.array([np.hstack((in_progress_job_state, setup_time_state, utilization_state, action_history_state))], dtype=np.float32)
+        scalar = MinMaxScaler(feature_range=(-1, 1))
+
+        return np.array([np.hstack((scalar.fit_transform(in_progress_job_state), scalar.fit_transform(setup_time_state), scalar.fit_transform(utilization_state), action_history_state))], dtype=np.float32)
 
     def draw_gantt(self, instance):
         df = []

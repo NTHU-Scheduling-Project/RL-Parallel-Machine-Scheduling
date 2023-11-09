@@ -27,13 +27,13 @@ class DQN:
     def __init__(
         self,
         n_actions,
-        replay_buffer_capacity: int = 10000,
+        replay_buffer_capacity: int = 100000,
         batch_size: int = 128,
-        learning_rate: float = 0.001,
+        learning_rate: float = 0.0001,
         tau: float = 0.005,
         gamma: float = 0.99,
         epsilon_start: float = 1.0,
-        epsilon_end: float = 0.05,
+        epsilon_end: float = 0.1,
         epsilon_decay_duration: int = 1000
     ):
         self.n_actions = n_actions

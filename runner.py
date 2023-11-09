@@ -117,11 +117,11 @@ class Runner:
             #print("\n")
             pbar.set_description(f"Instance {count}: makespan={self.env.makespan}, utilization={R}")
             
-            statistics = agent.get_statistics()
+            '''statistics = agent.get_statistics()
             self.add_scalar(phase + "/episode_reward", R, i)
             #self.add_scalar(phase + "/makespan", self.env.makespan, i)
             self.add_scalar(phase + "/average_q", statistics[0][1], i)
-            self.add_scalar(phase + "/average_loss", statistics[1][1], i)
+            self.add_scalar(phase + "/average_loss", statistics[1][1], i)'''
             total_utilization += R
 
         statistics = agent.get_statistics()
