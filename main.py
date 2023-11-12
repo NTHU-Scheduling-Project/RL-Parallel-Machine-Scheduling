@@ -16,11 +16,11 @@ if __name__ == '__main__':
 
     run_config = global_util.load_yaml("data/run_config.yml")
     # read input file
-    pt_tmp = pd.read_excel("data/dataset_250_10.xlsx",sheet_name="Processing Time",index_col =[0])
-    jt_tmp = pd.read_excel("data/dataset_250_10.xlsx",sheet_name="Job Type",index_col =[0])
+    pt_tmp = pd.read_excel("data/dataset_100_10.xlsx",sheet_name="Processing Time",index_col =[0])
+    jt_tmp = pd.read_excel("data/dataset_100_10.xlsx",sheet_name="Job Type",index_col =[0])
 
     N_J = pt_tmp.shape[0] # number of jobs
-    N_M = 15 # number of machines
+    N_M = 5 # number of machines
 
     processing_time = [list(map(int, pt_tmp.iloc[i])) for i in range(N_J)]
     job_family = [list(map(int,jt_tmp.iloc[i])) for i in range(N_J)]
