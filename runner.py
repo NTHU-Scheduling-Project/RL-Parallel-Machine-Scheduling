@@ -10,7 +10,7 @@ from tensorboardX import SummaryWriter
 from env.env import PMSPEnv
 
 class Runner:
-    def __init__(self, args, run_config: dict, env, N_F, training_data, validation_data):
+    def __init__(self, args, run_config: dict, env, N_F, training_data, validation_data, testing_data):
         self.args = args
         self.run_config = run_config
         self.N_F = N_F
@@ -30,7 +30,10 @@ class Runner:
         self.job_family_dataset, self.processing_time_dataset = np.split(training_data, [2], axis=2)
         self.job_family_dataset = self.job_family_dataset.astype(int)
         self.processing_time_dataset = self.processing_time_dataset.astype(int)
-        self.validation_dataset = validation_data
+        self.validation_job_family_dataset, self.validation_processing_time_dataset = np.split(validation_data, [2], axis=2)
+        self.validation_job_family_dataset = self.validation_job_family_dataset.astype(int)
+        self.testing_job_family_dataset, self.testing_processing_time_dataset = np.split(testing_data, [2], axis=2)
+        self.testing_job_family_dataset = self.testing_job_family_dataset.astype(int)
 
     def train(self, agent):
         highest_utilization = 0.0
@@ -81,18 +84,25 @@ class Runner:
                 #agent.save(os.path.join(self.model_dir, "epi_{}".format(i)))
 
     def validate(self, agent, start_i=1, phase="val"):
+        if phase == "val":
+            n_episodes = self.validation_job_family_dataset.shape[0]
         if phase == "test":
             #agent.load(self.model_dir)
             agent.load(os.path.join(self.model_dir, "best"))
+            n_episodes = self.testing_job_family_dataset.shape[0]
 
-        n_episodes = len(self.validation_dataset)
+        #n_episodes = self.validation_job_family_dataset.shape[0]
         count = 0
         total_utilization = 0
         #with agent.eval_mode():
         pbar = tqdm(range((start_i - 1) * n_episodes + 1, start_i * n_episodes + 1))
         for i in pbar:
-            processing_time = self.validation_dataset[count][0]
-            job_family = self.validation_dataset[count][1]
+            if phase == "val":
+                processing_time = self.validation_processing_time_dataset[count]
+                job_family = self.validation_job_family_dataset[count]
+            elif phase == "test":
+                processing_time = self.testing_processing_time_dataset[count]
+                job_family = self.testing_job_family_dataset[count]
             state = self.env.reset(processing_time, job_family)
             #state = torch.tensor(obs, dtype=torch.float32, device=self.device).unsqueeze(0)
             count += 1
@@ -110,11 +120,12 @@ class Runner:
                 state = next_state
                 t += 1
                 if done:
-                    #if phase == "test":
-                        #self.env.draw_gantt(count)
+                    if phase == "test" and count == 1:
+                        self.env.draw_gantt(f"Test instance{count}")
                     break
 
-            #print("\n")
+            if phase == "test":
+                print("\n")
             pbar.set_description(f"Instance {count}: makespan={self.env.makespan}, utilization={R}")
             
             '''statistics = agent.get_statistics()
@@ -124,11 +135,15 @@ class Runner:
             self.add_scalar(phase + "/average_loss", statistics[1][1], i)'''
             total_utilization += R
 
-        statistics = agent.get_statistics()
-        self.add_scalar(phase + "/episode_reward", total_utilization / n_episodes, start_i - 1)
-        #self.add_scalar(phase + "/makespan", self.env.makespan, i)
-        self.add_scalar(phase + "/average_q", statistics[0][1], start_i - 1)
-        self.add_scalar(phase + "/average_loss", statistics[1][1], start_i - 1)
+        if phase == "val":
+            statistics = agent.get_statistics()
+            self.add_scalar(phase + "/episode_reward", total_utilization / n_episodes, start_i - 1)
+            #self.add_scalar(phase + "/makespan", self.env.makespan, i)
+            self.add_scalar(phase + "/average_q", statistics[0][1], start_i - 1)
+            self.add_scalar(phase + "/average_loss", statistics[1][1], start_i - 1)
+
+        if phase == "test":
+            print(f"Average utilization= {total_utilization / n_episodes}")
         
         return total_utilization / n_episodes
     

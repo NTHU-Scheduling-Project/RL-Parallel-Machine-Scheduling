@@ -252,20 +252,6 @@ class PMSPEnv(gym.Env):
     def draw_gantt(self, instance):
         df = []
         start_timestamp = datetime.datetime.now().timestamp()
-        # iterate through all jobs and their operations
-        for job in range(self.N_J):
-            dict_op = dict()
-            dict_op["Resource"] = f"Job {job + 1}"
-            # calculate start and finish time of the operation
-            finish_time = start_timestamp + self.job_end_time[job]
-            start_time = start_timestamp + self.job_start_time[job]
-            # return the date corresponding to the timestamp
-            dict_op["Start"] = datetime.datetime.fromtimestamp(start_time)
-            dict_op["Finish"] = datetime.datetime.fromtimestamp(finish_time)
-            # retrieve the machine number corresponding to (job, operation j)
-            dict_op["Task"] = f"Machine {self.job_assigned_machine[job] + 1}"
-            df.append(dict_op)
-
         for machine in range(self.N_M):
             for record in self.setup_record_per_machine[machine]:
                 dict_op = dict()
@@ -279,6 +265,20 @@ class PMSPEnv(gym.Env):
                 # retrieve the machine number corresponding to (job, operation j)
                 dict_op["Task"] = f"Machine {machine + 1}"
                 df.append(dict_op)
+
+        # iterate through all jobs and their operations
+        for job in range(self.N_J):
+            dict_op = dict()
+            dict_op["Resource"] = f"Job {job + 1}"
+            # calculate start and finish time of the operation
+            finish_time = start_timestamp + self.job_end_time[job]
+            start_time = start_timestamp + self.job_start_time[job]
+            # return the date corresponding to the timestamp
+            dict_op["Start"] = datetime.datetime.fromtimestamp(start_time)
+            dict_op["Finish"] = datetime.datetime.fromtimestamp(finish_time)
+            # retrieve the machine number corresponding to (job, operation j)
+            dict_op["Task"] = f"Machine {self.job_assigned_machine[job] + 1}"
+            df.append(dict_op)
 
         # sort the list of dictionary by job number and machine number
         #df.sort(key=lambda k : (int(k['Resource'].split(' ')[1]), int(k['Task'].split(' ')[1]))) 

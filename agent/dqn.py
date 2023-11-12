@@ -29,7 +29,7 @@ class DQN:
         n_actions,
         replay_buffer_capacity: int = 100000,
         batch_size: int = 128,
-        learning_rate: float = 0.0001,
+        learning_rate: float = 0.000001,
         tau: float = 0.005,
         gamma: float = 0.99,
         epsilon_start: float = 1.0,
@@ -83,7 +83,7 @@ class DQN:
         self.step_counter += 1
 
         #if sample < self.epsilon_threshold and flag != "val":
-        if sample < self.epsilon_threshold or flag != "val":        
+        if sample < self.epsilon_threshold or flag != "val" or flag != "test":        
             action = np.random.choice(legal_actions)
         else:
             q_values = self.q_network(state).detach()[0]

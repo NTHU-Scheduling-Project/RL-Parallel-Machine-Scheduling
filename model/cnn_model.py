@@ -15,17 +15,17 @@ class Net(nn.Module):
 
         if not dueling:
             self.value = nn.Sequential(
-                nn.Linear(4*13*64, 256),
+                nn.Linear(10*23*64, 512),
+                nn.ReLU(),
+                nn.Linear(512, 256),
                 nn.ReLU(),
                 nn.Linear(256, 128),
                 nn.ReLU(),
-                nn.Linear(128, 64),
-                nn.ReLU(),
-                nn.Linear(64, n_actions),
+                nn.Linear(128, n_actions),
             )
         else:
             self.value = nn.Sequential(
-                nn.Linear(4*13*64, 256),
+                nn.Linear(10*23*64, 256),
                 nn.ReLU(),
                 nn.Linear(256, 128),
                 nn.ReLU(),
@@ -34,7 +34,7 @@ class Net(nn.Module):
                 nn.Linear(64, 1),
             )
             self.advantage = nn.Sequential(
-                nn.Linear(4*13*64, 256),
+                nn.Linear(10*23*64, 256),
                 nn.ReLU(),
                 nn.Linear(256, 128),
                 nn.ReLU(),
